@@ -1,0 +1,84 @@
+
+
+# //hello   其他配置后续在放里面,其实也可以轮询
+
+# AI 配置
+ai:
+  # OpenAI / ChatGPT 配置
+  openai:
+    api_key: "sk-your-api-key-here"
+    base_url: "https://api.openai.com/v1"  # 可选，使用第三方代理时修改
+    model: "gpt-4-turbo"  # 可选: gpt-4, gpt-4-turbo, gpt-3.5-turbo
+
+  deepseek:
+    api_key: "sk-your-api-key-here"   
+    base_url: "https://api.deepseek.com/v1"
+    model: "deepseek-chat"
+    
+  # Google Gemini 配置
+  gemini:
+    api_key: "your-gemini-api-key"
+    base_url: "https://generativelanguage.googleapis.com/v1beta"
+    model: "gemini-1.5-pro"
+
+
+  # 本地 LLM 配置（Ollama 等）
+  local_llm:
+    base_url: "http://localhost:11434"
+    model: "llama2"  # 可选: llama2, codellama, mistral 等
+
+# 区块链网络配置
+chains:
+  # 以太坊主网
+  eth:
+    name: "Ethereum"
+    chain_id: 1
+    rpc_urls:  #轮询,可以设置多个也可以单个
+      - ""
+      - ""
+      - ""
+    explorer:
+      api_key: ""  # 单个 API key（向后兼容，如果设置了 api_keys 则忽略此项）
+      api_keys:    # 多个 API keys（推荐使用，支持轮询）
+        - ""
+        - ""
+        - ""
+      base_url: "https://api.etherscan.io/v2"
+    table_name: "ethereum"
+
+  # Binance Smart Chain
+  bsc:
+    name: "Binance Smart Chain"
+    chain_id: 56
+    rpc_urls:
+      - ""
+
+    explorer:
+      api_key: ""
+      api_keys:
+        - ""
+        - ""
+      base_url: "https://api.etherscan.io/v2"
+    table_name: "bsc"
+
+  # Base
+  base:
+    name: "Base"
+    chain_id: 8453
+    rpc_urls:
+      - ""
+    explorer:
+      api_key: ""
+      api_keys:
+        - ""
+        - ""
+      base_url: "https://api.etherscan.io/v2"
+    table_name: "base"
+
+# 数据库配置
+database:
+  host: "localhost"
+  port: "3306"
+  user: "root"
+  password: "123456"
+  name: "solidity_excavator"

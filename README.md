@@ -1,2 +1,42 @@
-# Vespera
-A highly flexible AI Agent-driven EVM smart contract vulnerability detection framework
+<div align="center">
+
+# 🛡️ Vespera
+
+AI Agent 驱动的 EVM 智能合约漏洞检测框架，支持定向扫描与混合模糊扫描，面向研究与工程化审计场景。
+
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
+[![License](https://img.shields.io/badge/Apache-License-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-EVM-blue)](https://ethereum.org/)
+
+</div>
+
+## 📘 文档
+
+完整文档请访问：
+
+- https://vectorbits.gitbook.io/vespera-doc/
+
+## ✨ 概览
+
+- 模式：Mode 1（定向扫描）、Mode 2（混合模糊扫描）
+- 能力：策略驱动、AI 多模型接入、Slither + LLM 组合验证
+- 适用：学术实验、漏洞复现、链上批量扫描与监控
+
+## ⚡ 快速开始
+
+```bash
+./install.sh
+```
+
+```bash
+go build -o vespera src/main.go
+./vespera --help
+```
+
+## 📄 License
+
+Apache-2.0
+
+<div align="center">
+  <sub>Built with ❤️ for the Web3 Security Community</sub>
+</div>

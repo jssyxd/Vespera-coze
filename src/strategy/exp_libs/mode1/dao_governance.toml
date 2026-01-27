@@ -1,0 +1,151 @@
+[漏洞合约源码]
+code = """
+pragma solidity ^0.8.0;
+
+// 漏洞示例 1: 闪电贷投票攻击
+contract VulnerableGovernance {
+    IERC20 public votingToken;
+    mapping(uint256 => Proposal) public proposals;
+    
+    struct Proposal {
+        uint256 forVotes;
+        uint256 againstVotes;
+        uint256 quorum;
+        bool executed;
+    }
+    
+    // 漏洞：没有锁定机制，允许闪电贷攻击
+    function vote(uint256 proposalId, bool support) external {
+        uint256 weight = votingToken.balanceOf(msg.sender);
+        if (support) {
+            proposals[proposalId].forVotes += weight;
+        } else {
+            proposals[proposalId].againstVotes += weight;
+        }
+        // 缺失：没有锁定代币，投票后可立即转走
+    }
+    
+    // 漏洞：可以在同一区块内从投票状态转为成功状态
+    function execute(uint256 proposalId) external {
+        Proposal storage p = proposals[proposalId];
+        require(p.forVotes >= p.quorum, "Quorum not reached");
+        require(!p.executed, "Already executed");
+        p.executed = true;
+        // 执行提案...
+    }
+}
+
+// 漏洞示例 2: 委托投票绕过限制
+contract VulnerableDelegation {
+    mapping(address => uint256) public votingPower;
+    mapping(address => address) public delegates;
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
+    mapping(uint256 => mapping(address => bool)) public restrictedVoters;
+    
+    // 漏洞：被限制的用户可以通过委托来投票
+    function delegate(address to, uint256 amount) external {
+        votingPower[msg.sender] -= amount;
+        votingPower[to] += amount;
+        delegates[msg.sender] = to;
+    }
+    
+    function vote(uint256 proposalId, bool support) external {
+        require(!restrictedVoters[proposalId][msg.sender], "Restricted");
+        // 但被限制用户可以委托给另一个地址然后投票
+        uint256 weight = votingPower[msg.sender];
+        // ...
+    }
+}
+
+// 漏洞示例 3: 投票权计算错误
+contract VulnerableVotingPower {
+    mapping(uint256 => uint256) public nftPower;
+    uint256 public totalPower;
+    uint256 public powerCalcStartTimestamp;
+    
+    // 漏洞：getNftPower 和 recalculateNftPower 的边界条件不一致
+    function getNftPower(uint256 tokenId) public view returns (uint256) {
+        if (block.timestamp <= powerCalcStartTimestamp) {  // 使用 <=
+            return 0;
+        }
+        return nftPower[tokenId];
+    }
+    
+    function recalculateNftPower(uint256 tokenId) public returns (uint256) {
+        if (block.timestamp < powerCalcStartTimestamp) {  // 使用 <，不一致！
+            return 0;
+        }
+        uint256 newPower = getNftPower(tokenId);
+        // 当 block.timestamp == powerCalcStartTimestamp 时，
+        // getNftPower 返回 0，但此函数继续执行，导致 totalPower 被错误修改
+        totalPower -= getMaxPower(tokenId);
+        totalPower += newPower;  // newPower = 0
+        return newPower;
+    }
+}
+"""
+
+[漏洞描述]
+code = """
+DAO 治理（DAO Governance）漏洞是针对链上去中心化治理协议的攻击向量。由于链上治理的透明性，攻击者可以利用各种创造性方法来操纵投票结果、窃取资金或破坏治理功能。
+
+主要漏洞类型：
+
+1. **闪电贷投票攻击 (Flash-Loan Voting Attack)**：
+   - 攻击者借入大量投票代币
+   - 立即投票决定提案结果
+   - 提取代币并归还闪电贷
+   - 防护缺失：没有代币锁定机制、同区块状态转换限制
+
+2. **投票权销毁攻击 (Voting Power Destruction)**：
+   - 利用投票权计算算法的漏洞
+   - 使所有用户的投票权归零
+   - 常见于边界条件检查不一致 ("< " vs "<=")
+
+3. **投票权放大攻击 (Voting Power Amplification)**：
+   - 通过降低总投票权来放大个人投票权
+   - 调用不存在的 tokenId 触发错误计算
+   - 使少数人可以达到法定人数
+
+4. **快照不正确攻击 (Incorrect Snapshot)**：
+   - 提案创建时快照的总投票权不正确
+   - 动态变化的投票权未及时更新
+   - 导致投票权被错误放大或缩小
+
+5. **无法达到法定人数 (Impossible Quorum)**：
+   - DAO 进入永久无法达到法定人数的状态
+   - 多种代币类型组合导致的分母计算错误
+   - DAO 被永久锁定
+
+6. **委托绕过限制 (Delegation Bypass)**：
+   - 被限制投票的用户通过委托来投票
+   - 使用委托投票权给自己更多权力
+   - 委托/取消委托的时序漏洞
+
+7. **重复投票攻击 (Double Voting)**：
+   - 用同一代币多次投票
+   - 投票后转移代币到另一地址再投票
+   - 自委托导致投票权翻倍
+
+8. **代币永久锁定 (Token Forever Locked)**：
+   - 没有截止日期的提案永远处于活跃状态
+   - 投票者代币被永久锁定
+
+9. **代币铸造前攻击 (Pre-Mint Attack)**：
+   - 在投票代币铸造前操控 DAO
+   - 0/0 比较逻辑通过
+   - 任何人可以创建和执行提案
+
+10. **代币销售漏洞 (Token Sale Exploitation)**：
+    - 利用代币精度差异免费购买
+    - 绕过每用户最大分配限制
+
+关键检查点：
+- 投票代币是否被锁定直到提案结束
+- 是否有同区块操作限制
+- 委托/取消委托是否有时间限制
+- 投票权计算是否一致
+- 快照机制是否正确
+- 法定人数计算分母是否正确
+- 是否存在边界条件不一致
+"""

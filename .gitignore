@@ -1,0 +1,13 @@
+.obsidian
+.idea
+.vscode
+.DS_Store
+src/config/settings.yaml
+benchmark/*
+reports/*.md
+test/solodit/*
+Contract-list
+reports
+log/*
+flattened_contracts
+config/settings.yaml
