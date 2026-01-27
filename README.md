@@ -14,7 +14,7 @@ AI Agent 驱动的 EVM 智能合约漏洞检测框架，支持定向扫描与混
 
 完整文档请访问：
 
-- https://vectorbits.gitbook.io/vespera-doc/
+- https://vespera-doc.vectorbits.net/
 
 ## ✨ 概览
 
