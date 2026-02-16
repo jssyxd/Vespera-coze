@@ -1,0 +1,101 @@
+# Vespera Configuration
+
+# Database Configuration (Supabase)
+database:
+  host: ${SUPABASE_HOST}
+  port: 5432
+  user: ${SUPABASE_USER}
+  password: ${SUPABASE_PASSWORD}
+  dbname: ${SUPABASE_DB}
+  sslmode: disable
+
+# AI Model Configuration
+ai:
+  # API Configuration
+  api_key: ${AI_API_KEY}
+  base_url: ${AI_BASE_URL}
+
+  # Available Models
+  models:
+    deepseek:
+      name: "deepseek-v3.2"
+      timeout: 300
+      description: "Logic reasoning and deep analysis"
+
+    glm:
+      name: "glm-4.7"
+      timeout: 300
+      description: "Security analysis specialist"
+
+    minimax:
+      name: "minimax-m2.1"
+      timeout: 120
+      description: "Fast response for real-time monitoring"
+
+    kimi:
+      name: "kimi-k2.5"
+      timeout: 300
+      description: "Long context processing"
+
+# Blockchain Configuration
+blockchain:
+  # Etherscan API
+  etherscan_api_key: ${ETHERSCAN_API_KEY}
+
+  # Supported Chains
+  chains:
+    eth:
+      name: "Ethereum Mainnet"
+      rpc_url: "https://eth.llamarpc.com"
+      explorer: "https://etherscan.io"
+      api_url: "https://api.etherscan.io/api"
+      chain_id: 1
+
+    bsc:
+      name: "BSC Mainnet"
+      rpc_url: "https://bsc-dataseed.binance.org"
+      explorer: "https://bscscan.com"
+      api_url: "https://api.bscscan.com/api"
+      chain_id: 56
+
+    polygon:
+      name: "Polygon Mainnet"
+      rpc_url: "https://polygon.llamarpc.com"
+      explorer: "https://polygonscan.com"
+      api_url: "https://api.polygonscan.com/api"
+      chain_id: 137
+
+    arbitrum:
+      name: "Arbitrum One"
+      rpc_url: "https://arb1.arbitrum.io/rpc"
+      explorer: "https://arbiscan.io"
+      api_url: "https://api.arbiscan.io/api"
+      chain_id: 42161
+
+# Scanner Configuration
+scanner:
+  # Default block range for Mode 2
+  default_block_range: 200
+
+  # Maximum contracts to scan per run
+  max_contracts_per_run: 50
+
+  # Concurrency settings
+  max_concurrent_scans: 5
+
+  # Report settings
+  report_retention_days: 7
+
+# Feature Flags
+features:
+  # Enable multi-model validation
+  multi_model_validation: true
+
+  # Enable Slither static analysis
+  slither_analysis: true
+
+  # Enable arbitrage detection
+  arbitrage_detection: true
+
+  # Enable real-time monitoring
+  realtime_monitoring: false

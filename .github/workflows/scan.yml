@@ -1,0 +1,141 @@
+name: Vespera Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      scan_mode:
+        description: 'Scan mode (mode1/mode2/mode3)'
+        required: true
+        default: 'mode2'
+        type: choice
+        options:
+          - mode1
+          - mode2
+          - mode3
+      chain:
+        description: 'Blockchain to scan'
+        required: true
+        default: 'eth'
+        type: choice
+        options:
+          - eth
+          - bsc
+          - polygon
+          - arbitrum
+      block_range:
+        description: 'Block range (e.g., 20000000-20000200)'
+        required: false
+        default: '20000000-20000200'
+      contract_address:
+        description: 'Contract address (for mode1)'
+        required: false
+        default: ''
+  schedule:
+    - cron: '0 0,12 * * *'  # 每天 0:00 和 12:00 UTC
+
+env:
+  GO_VERSION: '1.21'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Slither and dependencies
+        run: |
+          pip install slither-analyzer solc-select
+          solc-select install 0.8.19
+          solc-select use 0.8.19
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download Go dependencies
+        run: |
+          cd src
+          go mod init vespera 2>/dev/null || true
+          go get gorm.io/gorm gorm.io/driver/postgres github.com/lib/pq github.com/joho/godotenv
+          go mod tidy
+
+      - name: Build Vespera
+        run: |
+          cd src
+          go build -o ../vespera ./cmd/vespera
+
+      - name: Test database connection
+        env:
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
+          SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          SUPABASE_DB: ${{ secrets.SUPABASE_DB }}
+        run: |
+          ./vespera -test-db
+
+      - name: Run Vespera Scan
+        env:
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
+          SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          SUPABASE_DB: ${{ secrets.SUPABASE_DB }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: |
+          mkdir -p reports
+          SCAN_MODE="${{ github.event.inputs.scan_mode || 'mode2' }}"
+          CHAIN="${{ github.event.inputs.chain || 'eth' }}"
+
+          if [ "$SCAN_MODE" = "mode1" ] && [ -n "${{ github.event.inputs.contract_address }}" ]; then
+            ./vespera -m mode1 -c "$CHAIN" -addr "${{ github.event.inputs.contract_address }}" -o reports/
+          else
+            RANGE="${{ github.event.inputs.block_range || '20000000-20000200' }}"
+            ./vespera -m "$SCAN_MODE" -ai deepseek -c "$CHAIN" -range "$RANGE" -o reports/
+          fi
+
+      - name: Upload scan report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scan-report-${{ github.run_id }}
+          path: reports/
+          retention-days: 7
+          compression-level: 9
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## Vespera Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scan Mode**: ${{ github.event.inputs.scan_mode || 'mode2' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Chain**: ${{ github.event.inputs.chain || 'eth' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f reports/summary.md ]; then
+            cat reports/summary.md >> $GITHUB_STEP_SUMMARY
+          fi
