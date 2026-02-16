@@ -165,12 +165,6 @@ func (e *EtherscanAPI) getBasicContractInfo(address string) (*ContractCreation, 
 		return nil, err
 	}
 
-	// Get transaction count to estimate block
-	txCount, err := e.GetTransactionCount(address)
-	if err != nil {
-		txCount = "0"
-	}
-
 	return &ContractCreation{
 		ContractAddress: address,
 		ContractCode:    code,
