@@ -75,10 +75,17 @@ jobs:
         run: mkdir -p data
 
       - name: Download latest database
-        uses: actions/download-artifact@v4
-        with:
-          name: vespera-database-${{ github.event.inputs.chain || 'eth' }}
-          path: data/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the latest successful initialization run
+          LATEST_RUN=$(gh run list --workflow="Initialize Database" --status=success --limit=1 --json=databaseId -q '.[0].databaseId')
+          if [ -n "$LATEST_RUN" ]; then
+            echo "Downloading database from run $LATEST_RUN"
+            gh run download $LATEST_RUN --name vespera-database-${{ github.event.inputs.chain || 'eth' }} --dir data/ || echo "No database found"
+          else
+            echo "No previous initialization run found"
+          fi
         continue-on-error: true
 
       - name: List data directory
