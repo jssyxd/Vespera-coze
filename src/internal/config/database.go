@@ -15,8 +15,13 @@ type Database struct {
 }
 
 func NewPostgresDB(cfg *DatabaseConfig) (*Database, error) {
+	// Use SSL for Supabase connections
+	sslMode := cfg.SSLMode
+	if sslMode == "" {
+		sslMode = "require"
+	}
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
+		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, sslMode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
