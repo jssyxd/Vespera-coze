@@ -71,21 +71,15 @@ jobs:
           cd ..
           ls -la vespera
 
-      - name: Install dnsutils
-        run: sudo apt-get update && sudo apt-get install -y dnsutils
-
-      - name: Get Supabase IPv4 address
-        id: get_ip
+      - name: Configure hosts for Supabase IPv6
         run: |
-          # Get IPv4 address for Supabase host
-          HOST="db.cbegtzifclgqngzzpvos.supabase.co"
-          IP=$(dig +short "$HOST" A | head -n 1)
-          echo "SUPABASE_IP=$IP" >> $GITHUB_ENV
-          echo "Resolved $HOST to $IP"
+          # Add Supabase host to /etc/hosts with IPv6
+          echo "2406:da14:271:990c:bf54:5872:d136:8f81 db.cbegtzifclgqngzzpvos.supabase.co" | sudo tee -a /etc/hosts
+          cat /etc/hosts | grep supabase
 
       - name: Test database connection
         env:
-          SUPABASE_HOST: ${{ env.SUPABASE_IP }}
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
           SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
           SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
           SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
@@ -99,7 +93,7 @@ jobs:
 
       - name: Run Vespera Scan
         env:
-          SUPABASE_HOST: ${{ env.SUPABASE_IP }}
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
           SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
           SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
           SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
