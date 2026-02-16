@@ -146,7 +146,7 @@ func printSummary(report *scanner.Report) {
 	if len(report.Vulnerabilities) > 0 {
 		fmt.Println("\n🚨 VULNERABILITIES:")
 		for _, v := range report.Vulnerabilities {
-			fmt.Printf("  [%s] %s - %s\n", v.Severity, v.Type, v.Address)
+			fmt.Printf("  [%s] %s (Line %d)\n", v.Severity, v.Type, v.Line)
 		}
 	}
 
