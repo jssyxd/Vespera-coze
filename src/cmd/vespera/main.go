@@ -38,10 +38,20 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Initialize database
-	db, err := config.NewPostgresDB(&cfg.Database)
+	// Initialize database - try PostgreSQL first, then SQLite fallback
+	var db *config.Database
+	db, err = config.NewPostgresDB(&cfg.Database)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Printf("⚠️ PostgreSQL connection failed: %v", err)
+		log.Println("🔄 Falling back to SQLite...")
+		db, err = config.NewSQLiteDB("./data/vespera.db")
+		if err != nil {
+			log.Fatalf("Failed to connect to SQLite: %v", err)
+		}
+		// Initialize SQLite tables
+		if err := config.InitSQLiteTables(db, []string{"eth", "bsc", "polygon", "arbitrum"}); err != nil {
+			log.Printf("Warning: SQLite init failed: %v", err)
+		}
 	}
 	defer db.Close()
 
@@ -122,13 +132,20 @@ func testDatabaseConnection() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	// Try PostgreSQL first
 	db, err := config.NewPostgresDB(&cfg.Database)
 	if err != nil {
-		log.Fatalf("❌ Database connection failed: %v", err)
+		log.Printf("⚠️ PostgreSQL connection failed: %v", err)
+		log.Println("🔄 Trying SQLite fallback...")
+		db, err = config.NewSQLiteDB("./data/vespera.db")
+		if err != nil {
+			log.Fatalf("❌ Database connection failed: %v", err)
+		}
+		log.Println("✅ SQLite connection successful")
+	} else {
+		log.Println("✅ PostgreSQL connection successful")
 	}
 	defer db.Close()
-
-	log.Println("✅ Database connection successful")
 	os.Exit(0)
 }
 

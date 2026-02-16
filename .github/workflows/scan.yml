@@ -71,11 +71,8 @@ jobs:
           cd ..
           ls -la vespera
 
-      - name: Configure hosts for Supabase IPv6
-        run: |
-          # Add Supabase host to /etc/hosts with IPv6
-          echo "2406:da14:271:990c:bf54:5872:d136:8f81 db.cbegtzifclgqngzzpvos.supabase.co" | sudo tee -a /etc/hosts
-          cat /etc/hosts | grep supabase
+      - name: Create data directory
+        run: mkdir -p data
 
       - name: Test database connection
         env:
