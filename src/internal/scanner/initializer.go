@@ -27,6 +27,11 @@ type ContractCreation struct {
 	ContractCode    string `json:"contractCode,omitempty"`
 }
 
+const (
+	EtherscanV2API = "https://api.etherscan.io/v2/api"
+	ChainIDEthereum = "1"
+)
+
 func NewEtherscanAPI(apiKey string) *EtherscanAPI {
 	return &EtherscanAPI{
 		apiKey: apiKey,
@@ -36,10 +41,11 @@ func NewEtherscanAPI(apiKey string) *EtherscanAPI {
 	}
 }
 
-// makeRequest makes a request to Etherscan API with retry logic
+// makeRequest makes a request to Etherscan API V2 with retry logic
 func (e *EtherscanAPI) makeRequest(params url.Values) (*EtherscanResponse, error) {
 	params.Set("apikey", e.apiKey)
-	reqURL := fmt.Sprintf("https://api.etherscan.io/api?%s", params.Encode())
+	params.Set("chainid", ChainIDEthereum) // V2 requires chainid
+	reqURL := fmt.Sprintf("%s?%s", EtherscanV2API, params.Encode())
 
 	var lastErr error
 	for attempt := 0; attempt < 3; attempt++ {
