@@ -71,21 +71,32 @@ jobs:
           cd ..
           ls -la vespera
 
+      - name: Get Supabase IPv4 address
+        id: get_ip
+        run: |
+          # Get IPv4 address for Supabase host
+          HOST="${{ secrets.SUPABASE_HOST }}"
+          IP=$(getent ahostsv4 "$HOST" | head -n 1 | awk '{ print $1 }')
+          echo "SUPABASE_IP=$IP" >> $GITHUB_ENV
+          echo "Resolved $HOST to $IP"
+
       - name: Test database connection
         env:
-          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_HOST: ${{ env.SUPABASE_IP }}
           SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
           SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
           SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
           SUPABASE_DB: ${{ secrets.SUPABASE_DB }}
           SUPABASE_SSLMODE: ${{ secrets.SUPABASE_SSLMODE || 'require' }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
         run: |
           chmod +x vespera
           ./vespera -test-db || echo "Database test completed"
 
       - name: Run Vespera Scan
         env:
-          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_HOST: ${{ env.SUPABASE_IP }}
           SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
           SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
           SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
