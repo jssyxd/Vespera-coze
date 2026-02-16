@@ -11,8 +11,6 @@ import (
 
 	"vespera/internal/ai"
 	"vespera/internal/config"
-
-	"gorm.io/gorm"
 )
 
 type Scanner struct {
