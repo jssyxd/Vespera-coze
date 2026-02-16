@@ -1,0 +1,74 @@
+name: Initialize Database
+
+on:
+  workflow_dispatch:
+    inputs:
+      chain:
+        description: 'Blockchain to initialize'
+        required: true
+        default: 'eth'
+        type: choice
+        options:
+          - eth
+          - bsc
+          - polygon
+          - arbitrum
+
+env:
+  GO_VERSION: '1.21'
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build Vespera
+        run: |
+          cd src
+          go mod tidy
+          go build -o ../vespera ./cmd/vespera
+          cd ..
+          ls -la vespera
+
+      - name: Create data directory
+        run: mkdir -p data
+
+      - name: Initialize database
+        env:
+          SUPABASE_HOST: ${{ secrets.SUPABASE_HOST }}
+          SUPABASE_PORT: ${{ secrets.SUPABASE_PORT }}
+          SUPABASE_USER: ${{ secrets.SUPABASE_USER }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          SUPABASE_DB: ${{ secrets.SUPABASE_DB }}
+          SUPABASE_SSLMODE: ${{ secrets.SUPABASE_SSLMODE || 'require' }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        run: |
+          chmod +x vespera
+          ./vespera init -c ${{ github.event.inputs.chain || 'eth' }}
+
+      - name: Upload database
+        uses: actions/upload-artifact@v4
+        with:
+          name: vespera-database-${{ github.event.inputs.chain || 'eth' }}
+          path: data/
+          retention-days: 30
+
+      - name: Generate summary
+        run: |
+          echo "## Database Initialization Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Chain**: ${{ github.event.inputs.chain || 'eth' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY

@@ -25,6 +25,27 @@ type ScanOptions struct {
 }
 
 func main() {
+	// Check for subcommands
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "init":
+			// Remove subcommand from args
+			os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
+			runInitialization()
+			return
+		case "scan":
+			// Remove subcommand from args
+			os.Args = append([]string{os.Args[0]}, os.Args[2:]...)
+			runScan()
+			return
+		}
+	}
+
+	// Default: run scan
+	runScan()
+}
+
+func runScan() {
 	opts := parseFlags()
 
 	if opts.TestDBOnly {
