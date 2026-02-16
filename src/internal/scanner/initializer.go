@@ -93,7 +93,9 @@ func (e *EtherscanAPI) GetContractSource(address string) (*ContractSource, error
 	}
 
 	if apiResp.Status != "1" {
-		return nil, fmt.Errorf("API error: %s", apiResp.Message)
+		// Log detailed error for debugging
+		log.Printf("🔍 API Response for %s: Status=%s, Message=%s", address, apiResp.Status, apiResp.Message)
+		return nil, fmt.Errorf("API error: %s (status: %s)", apiResp.Message, apiResp.Status)
 	}
 
 	var sources []ContractSource
