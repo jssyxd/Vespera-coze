@@ -1,7 +1,4 @@
 package config
 
-import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-)
+// This file is intentionally empty.
+// All PostgreSQL functionality has been moved to database.go
