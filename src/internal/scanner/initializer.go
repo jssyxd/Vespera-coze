@@ -27,12 +27,6 @@ type ContractCreation struct {
 	ContractCode    string `json:"contractCode,omitempty"`
 }
 
-type EtherscanResponse struct {
-	Status  string          `json:"status"`
-	Message string          `json:"message"`
-	Result  json.RawMessage `json:"result"`
-}
-
 func NewEtherscanAPI(apiKey string) *EtherscanAPI {
 	return &EtherscanAPI{
 		apiKey: apiKey,
@@ -183,7 +177,7 @@ func (e *EtherscanAPI) getBasicContractInfo(address string) (*ContractCreation, 
 		BlockNumber:     "0",
 		Timestamp:       strconv.FormatInt(time.Now().Unix(), 10),
 		TxHash:          "",
-	}, txCount
+	}, nil
 }
 
 // GetContractCode fetches the contract source code
