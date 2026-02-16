@@ -71,12 +71,15 @@ jobs:
           cd ..
           ls -la vespera
 
+      - name: Install dnsutils
+        run: sudo apt-get update && sudo apt-get install -y dnsutils
+
       - name: Get Supabase IPv4 address
         id: get_ip
         run: |
           # Get IPv4 address for Supabase host
-          HOST="${{ secrets.SUPABASE_HOST }}"
-          IP=$(getent ahostsv4 "$HOST" | head -n 1 | awk '{ print $1 }')
+          HOST="db.cbegtzifclgqngzzpvos.supabase.co"
+          IP=$(dig +short "$HOST" A | head -n 1)
           echo "SUPABASE_IP=$IP" >> $GITHUB_ENV
           echo "Resolved $HOST to $IP"
 
