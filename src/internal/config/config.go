@@ -39,7 +39,7 @@ func Load() (*Config, error) {
 			User:     getEnv("SUPABASE_USER", "postgres"),
 			Password: getEnv("SUPABASE_PASSWORD", ""),
 			DBName:   getEnv("SUPABASE_DB", "postgres"),
-			SSLMode:  getEnv("SUPABASE_SSLMODE", "disable"),
+			SSLMode:  getEnv("SUPABASE_SSLMODE", "require"),
 		},
 		AI: AIConfig{
 			APIKey:  getEnv("AI_API_KEY", ""),
