@@ -1,0 +1,20 @@
+# Upstream Sync Protection Configuration
+# Files marked with merge=ours will always use local version during merge
+
+# CI/CD workflows - custom configuration
+.github/workflows/* merge=ours
+
+# Deployment scripts - custom implementation
+scripts/deploy.sh merge=ours
+scripts/init.sh merge=ours
+
+# Project documentation - customized versions
+CLAUDE.md merge=ours
+README.md merge=ours
+task.json merge=ours
+
+# Documentation directory - custom content
+docs/** merge=ours
+
+# This file itself - protect sync strategy configuration
+.gitattributes merge=ours
