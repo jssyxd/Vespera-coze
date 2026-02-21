@@ -1,0 +1,64 @@
+[漏洞合约源码]
+code = """
+pragma solidity ^0.8.0;
+
+contract VulnerableVault {
+    address public owner;
+    mapping(address => uint256) public balances;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+    function deposit() public payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    // 漏洞：缺少 onlyOwner 修饰符，任何人都可以调用并提取合约内所有资金
+    function emergencyWithdraw() public {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
+    // 漏洞：缺少旧 owner 验证或缺少 onlyOwner，导致任何人可以更改 owner
+    function setOwner(address newOwner) public {
+        owner = newOwner;
+    }
+}
+"""
+
+[漏洞描述]
+code = """
+访问控制（Access Control）漏洞通常发生在智能合约未能正确限制对敏感函数或数据的访问时。这不仅包括缺失修饰符，还包括权限分配错误和特权提升等问题。
+
+主要表现形式：
+1. **缺失修饰符（Missing Modifiers / Lack of AC Protection）**：
+   - 关键函数（如提款、更改所有者、铸造代币、关键参数设置）没有 `onlyOwner`、`onlyRole` 或其他权限验证修饰符。
+   - 示例：`function withdraw() public { ... }` （任何人都能调用）。
+
+2. **错误的权限配置（Incorrect Permissions）**：
+   - 函数虽然有修饰符，但检查的角色不正确。例如，本应仅限 `ADMIN` 调用的函数，却允许 `USER` 或 `OPERATOR` 调用。
+   - 示例：`function setProtocolFee() public onlyOperator { ... }` （应该只有 Admin 能改费用，Operator 权限过大）。
+
+3. **特权提升（Privilege Escalation）**：
+   - 允许非特权用户通过某些操作获得特权角色（如 Owner 或 Admin）。
+   - 常见场景：
+     - `initialize` 函数未受保护，攻击者抢跑调用成为 Owner。
+     - 修改 Owner 的函数（`setOwner`, `transferOwnership`）缺少旧 Owner 的验证。
+     - 自毁逻辑（`selfdestruct`）或委托调用（`delegatecall`）被利用来修改存储中的 Owner 变量。
+
+4. **错误的修饰符实现**：
+   - 修饰符逻辑有误，例如使用 `tx.origin` 而不是 `msg.sender` 进行身份验证（可能导致钓鱼攻击）。
+   - 只有 `require` 但条件写反，或者逻辑被绕过。
+
+5. **错误的可见性（Incorrect Visibility）**：
+   - 本应为 `internal` 或 `private` 的辅助函数被声明为 `public` 或 `external`，导致内部逻辑被直接利用。
+
+在上述示例中：
+- `emergencyWithdraw` 函数旨在仅由所有者调用，但缺少 `onlyOwner` 修饰符。
+- `setOwner` 函数允许任何人更改合约所有者，从而接管合约控制权。
+"""

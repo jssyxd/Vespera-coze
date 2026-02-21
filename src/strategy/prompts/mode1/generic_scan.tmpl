@@ -1,0 +1,47 @@
+我需要你作为一个专业的智能合约安全审计员，对以下目标合约代码进行全面的漏洞扫描和安全审计。注意:只需要中等及以上风险的漏洞。
+
+**目标合约信息：**
+合约地址：{{.ContractAddress}}
+
+**分析任务：**
+请仔细阅读并分析目标合约代码，利用你深厚的Solidity安全知识库，识别任何潜在的安全漏洞、逻辑缺陷。
+
+**需要分析的目标合约代码：**
+{{.ContractCode}}
+
+**分析要求：**
+1.  **全面扫描**：不局限于单一类型的漏洞，请检查所有常见的Solidity漏洞，包括但不限于：
+    -   Reentrancy (重入攻击)
+    -   Access Control Issues (权限控制缺失或错误)
+    -   Integer Overflow/Underflow (整数溢出，尽管Solidity 0.8+已内置检查，仍需注意unchecked块)
+    -   Unchecked Return Values (未检查的低级调用返回值)
+    -   Denial of Service (拒绝服务)
+    -   Bad Randomness (弱随机数)
+    -   Front-running / Transaction Ordering Dependence (抢跑/交易顺序依赖)
+    -   Logic Errors (业务逻辑错误)
+2.  **深度分析**：不要只看表面语法，要理解合约的业务逻辑和资金流向。
+3.  **误报过滤**：请仔细验证每一个发现的潜在漏洞，尽量排除明显的误报（例如使用了OpenZeppelin的标准实现）。
+
+**输出要求：**
+请仅输出一个合法的 JSON 对象，不要包含 Markdown 标记（如 ```json）。格式如下：
+
+{
+  "risk_score": "0-100 (基于漏洞危害和利用难度的综合评分)",
+  "vuln_probability": "High/Medium/Low (整体存在漏洞的概率)",
+  "severity": "整体风险等级 (Critical/High/Medium/Low/Safe)",
+  "vulnerabilities": [
+    {
+      "type": "漏洞类型 (例如: Reentrancy)",
+      "severity": "漏洞等级 (Critical/High/Medium/Low)",
+      "description": "详细描述：1. 漏洞位置（函数名/行号）；2. 缺陷原因；3. 攻击场景；4. 潜在危害。",
+      "location": "文件名:行号 (例如: Token.sol:L42)"
+    }
+  ],
+  "summary": "总结审计结果。如果发现漏洞，请简述危害；如果未发现，请简单说明已检查的关键点和合约的整体安全性。"
+}
+
+**判定准则：**
+1.  **Critical**: 任何人都可以窃取资金、销毁合约或接管控制权。
+2.  **High**: 未授权用户可以修改关键配置、暂停合约或影响核心业务逻辑。
+3.  **Medium**: 存在权限泄露但影响有限，或利用条件苛刻。
+4.  **Low**: 代码不规范、Gas优化建议或暂无直接危害的问题。
