@@ -28,7 +28,7 @@ ai:
       description: "Security analysis specialist"
 
     minimax:
-      name: "minimax-m2.1"
+      name: "minimax-m2.5"
       timeout: 120
       description: "Fast response for real-time monitoring"
 
