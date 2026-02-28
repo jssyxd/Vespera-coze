@@ -10,16 +10,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/ai"
-	"github.com/VectorBits/Vespera/src/internal/ai/parser"
-	"github.com/VectorBits/Vespera/src/internal/astparser"
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/download"
-	"github.com/VectorBits/Vespera/src/internal/logger"
-	"github.com/VectorBits/Vespera/src/internal/solc"
-	"github.com/VectorBits/Vespera/src/internal/static_analyzer"
-	"github.com/VectorBits/Vespera/src/internal/ui"
-	"github.com/VectorBits/Vespera/src/strategy/prompts"
+	"vespera/internal/ai"
+	"vespera/internal/ai/parser"
+	"vespera/internal/astparser"
+	"vespera/internal/config"
+	"vespera/internal/download"
+	"vespera/internal/logger"
+	"vespera/internal/solc"
+	"vespera/internal/static_analyzer"
+	"vespera/internal/ui"
+	"vespera/strategy/prompts"
 )
 
 // qhello RunMode2Fuzzy Mode2 混合扫描入口 (Slither + AI)

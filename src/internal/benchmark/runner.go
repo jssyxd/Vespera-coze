@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/config"
+	"vespera/internal/config"
 )
 
 // TestCase 定义单个测试用例

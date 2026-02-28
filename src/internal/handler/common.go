@@ -9,13 +9,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/VectorBits/Vespera/src/internal"
-	"github.com/VectorBits/Vespera/src/internal/ai/parser"
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/dbutil"
-	"github.com/VectorBits/Vespera/src/internal/download"
-	"github.com/VectorBits/Vespera/src/internal/logger"
-	"github.com/VectorBits/Vespera/src/internal/report"
+	"vespera/internal"
+	"vespera/internal/ai/parser"
+	"vespera/internal/config"
+	"vespera/internal/dbutil"
+	"vespera/internal/download"
+	"vespera/internal/logger"
+	"vespera/internal/report"
 )
 
 func InitScanLogger() error {

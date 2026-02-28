@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal"
+	"vespera/internal"
 )
 
 type EtherscanConfig struct {

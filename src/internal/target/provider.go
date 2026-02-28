@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/VectorBits/Vespera/src/internal"
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/dbutil"
-	"github.com/VectorBits/Vespera/src/internal/download"
-	"github.com/VectorBits/Vespera/src/internal/logger"
+	"vespera/internal"
+	"vespera/internal/config"
+	"vespera/internal/dbutil"
+	"vespera/internal/download"
+	"vespera/internal/logger"
 )
 
 // helloq GetTargetChannel 目标地址生产者

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/internal/ui"
 )
 
 func Print() {

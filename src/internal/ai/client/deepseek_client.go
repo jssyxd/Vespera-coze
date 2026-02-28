@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal"
-	"github.com/VectorBits/Vespera/src/internal/logger"
+	"vespera/internal"
+	"vespera/internal/logger"
 )
 
 type DeepSeekClient struct {

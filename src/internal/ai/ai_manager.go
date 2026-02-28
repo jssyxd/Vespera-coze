@@ -10,9 +10,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/ai/parser"
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/logger"
+	"vespera/internal/ai/parser"
+	"vespera/internal/config"
+	"vespera/internal/logger"
 )
 
 // qhello Manager AI 客户端管理器

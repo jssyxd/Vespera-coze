@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/internal/config"
+	"vespera/internal/ui"
 )
 
 func (d *Downloader) SubscribeNewContracts(ctx context.Context, callback func(address string)) error {

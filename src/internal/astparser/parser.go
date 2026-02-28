@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/VectorBits/Vespera/src/internal/solc"
+	"vespera/internal/solc"
 )
 
 // ParseFile 调用 solc 解析 AST（自动匹配版本）

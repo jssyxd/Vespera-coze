@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/config"
+	"vespera/internal/config"
 
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/internal/ui"
 )
 
 // Reporter 先不写

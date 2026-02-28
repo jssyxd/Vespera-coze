@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal"
+	"vespera/internal"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 )

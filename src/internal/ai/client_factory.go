@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/ai/client"
+	"vespera/internal/ai/client"
 )
 
 type AIClient interface {

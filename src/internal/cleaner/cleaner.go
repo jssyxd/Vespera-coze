@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/VectorBits/Vespera/src/internal/solc"
+	"vespera/internal/solc"
 )
 
 var LibraryPatterns = []string{

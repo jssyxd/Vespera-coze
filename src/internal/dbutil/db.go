@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/VectorBits/Vespera/src/internal/config"
+	"vespera/internal/config"
 )
 
 //qhello 这个文件可能有点问题。后面在改

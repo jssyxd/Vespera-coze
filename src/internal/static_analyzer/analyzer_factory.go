@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/VectorBits/Vespera/src/internal/logger"
-	"github.com/VectorBits/Vespera/src/internal/static_analyzer/backend"
+	"vespera/internal/logger"
+	"vespera/internal/static_analyzer/backend"
 )
 
 type BackendType string

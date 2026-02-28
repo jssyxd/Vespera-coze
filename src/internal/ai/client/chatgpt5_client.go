@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal"
+	"vespera/internal"
 )
 
 type ChatGPT5Client struct {

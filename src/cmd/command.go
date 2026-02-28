@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/VectorBits/Vespera/src/internal/benchmark"
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/download"
-	"github.com/VectorBits/Vespera/src/internal/handler"
-	"github.com/VectorBits/Vespera/src/internal/target"
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/internal/benchmark"
+	"vespera/internal/config"
+	"vespera/internal/download"
+	"vespera/internal/handler"
+	"vespera/internal/target"
+	"vespera/internal/ui"
 )
 
 func ExecuteDownload(ctx context.Context, cfg *CLIConfig) error {

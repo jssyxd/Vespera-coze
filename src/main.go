@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/VectorBits/Vespera/src/cmd"
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/cmd"
+	"vespera/internal/ui"
 )
 
 //go:embed config/settings.example.yaml

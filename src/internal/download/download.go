@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal/config"
-	"github.com/VectorBits/Vespera/src/internal/solc"
-	"github.com/VectorBits/Vespera/src/internal/ui"
+	"vespera/internal/config"
+	"vespera/internal/solc"
+	"vespera/internal/ui"
 	"github.com/ethereum/go-ethereum/common"
 )
 

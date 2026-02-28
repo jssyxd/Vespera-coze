@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/VectorBits/Vespera/src/internal"
+	"vespera/internal"
 )
 
 type LocalLLMClient struct {
