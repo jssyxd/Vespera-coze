@@ -6,11 +6,26 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
+
+// replaceEnvVars replaces ${VAR} patterns with environment variable values
+func replaceEnvVars(data []byte) []byte {
+	// Pattern matches ${VAR} where VAR is alphanumeric or underscore
+	re := regexp.MustCompile(`\$\{([A-Za-z_][A-Za-z0-9_]*)\}`)
+	return re.ReplaceAllFunc(data, func(match []byte) []byte {
+		varName := string(match[2 : len(match)-1]) // Remove ${ and }
+		value := os.Getenv(varName)
+		if value == "" {
+			return match // Keep original if env var not set
+		}
+		return []byte(value)
+	})
+}
 
 type ChainConfig struct {
 	Name      string   `yaml:"name"`
@@ -75,6 +90,9 @@ func LoadConfig() (*AppConfig, error) {
 			loadedErr = fmt.Errorf("Failed to read configuration file: %w", err)
 			return
 		}
+
+		// Replace ${VAR} with environment variables
+		data = replaceEnvVars(data)
 
 		var config AppConfig
 		if err := yaml.Unmarshal(data, &config); err != nil {
