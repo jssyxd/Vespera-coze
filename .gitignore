@@ -11,3 +11,8 @@ reports
 log/*
 flattened_contracts
 config/settings.yaml
+
+# Web build
+web/node_modules
+web/dist
+web/.env

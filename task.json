@@ -1,0 +1,36 @@
+{
+  "tasks": [
+    {
+      "id": "init-project",
+      "title": "初始化项目基础结构",
+      "description": "创建项目目录结构、go.mod、.env 配置、task.json 和 progress.txt",
+      "status": "completed",
+      "priority": "critical",
+      "dependencies": []
+    },
+    {
+      "id": "fix-config",
+      "title": "修复 API baseurl 配置",
+      "description": "修复 AI_BASE_URL 从旧 IP 改为 minimax，修复模型版本",
+      "status": "completed",
+      "priority": "critical",
+      "dependencies": []
+    },
+    {
+      "id": "react-frontend",
+      "title": "创建 React 管理面板",
+      "description": "创建 React + TailwindCSS 管理面板，路由 /panel",
+      "status": "completed",
+      "priority": "high",
+      "dependencies": []
+    },
+    {
+      "id": "test-submit",
+      "title": "测试和提交 PR",
+      "description": "测试所有功能，更新 progress.txt，提交并推送 PR",
+      "status": "completed",
+      "priority": "high",
+      "dependencies": []
+    }
+  ]
+}
