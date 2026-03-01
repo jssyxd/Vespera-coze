@@ -15,15 +15,15 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
+type ModelConfig struct {
+	Name    string
+	Timeout int
+}
+
 type AIConfig struct {
 	APIKey   string
 	BaseURL  string
 	Models   map[string]ModelConfig
-}
-
-type ModelConfig struct {
-	Name    string
-	Timeout int
 }
 
 type Config struct {
@@ -43,7 +43,7 @@ func Load() (*Config, error) {
 		},
 		AI: AIConfig{
 			APIKey:  getEnv("AI_API_KEY", ""),
-			BaseURL: getEnv("AI_BASE_URL", "http://139.224.113.163:8317/v1"),
+			BaseURL: getEnv("AI_BASE_URL", "https://api.minimaxi.com/anthropic/v1"),
 			Models: map[string]ModelConfig{
 				"deepseek": {
 					Name:    "deepseek-v3.2",
@@ -54,7 +54,7 @@ func Load() (*Config, error) {
 					Timeout: 300,
 				},
 				"minimax": {
-					Name:    "minimax-m2.1",
+					Name:    "minimax-m2.5",
 					Timeout: 120,
 				},
 				"kimi": {

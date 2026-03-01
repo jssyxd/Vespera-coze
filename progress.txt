@@ -1,0 +1,92 @@
+# Vespera-coze 项目进度
+
+## 2026-03-01 任务进度
+
+### 任务列表
+
+| ID | 任务名称 | 状态 | 优先级 |
+|----|----------|------|--------|
+| init-project | 初始化项目基础结构 | completed | critical |
+| fix-config | 修复 API baseurl 配置 | completed | critical |
+| react-frontend | 创建 React 管理面板 | completed | high |
+| test-submit | 测试和提交 PR | in_progress | high |
+
+---
+
+## 历史记录
+
+### 2026-03-01 15:15 - 修复 API baseurl 配置
+
+#### 已完成工作:
+- 更新 config.go 中 AI_BASE_URL 从 http://139.224.113.163:8317/v1 改为 https://api.minimaxi.com/anthropic/v1
+- 更新 minimax 模型从 minimax-m2.1 改为 minimax-m2.5
+- 修复 config_loader.go 与 config.go 的类型冲突
+- 添加缺失的 GetRPCManager, GetExplorerConfig, GetAPIKeyManager, GetChainConfig, GetTableName, InitDB 函数
+- 修复 DatabaseConfig 字段类型 (Port, DBName, SSLMode)
+- 添加 GetSQLDB 方法获取底层 sql.DB
+
+#### 创建的文件:
+- 无新文件创建
+
+#### 修改的文件:
+- /home/da/Vespera-coze/src/internal/config/config.go
+- /home/da/Vespera-coze/src/internal/config/config_loader.go
+- /home/da/Vespera-coze/src/internal/config/database.go
+
+#### 测试结果:
+- [x] Go 编译成功: go build -o bin/vespera src/
+- [x] 生成了可执行文件 bin/vespera (30 MB)
+
+---
+
+### 2026-03-01 15:20 - 创建 React 管理面板
+
+#### 已完成工作:
+- 创建完整的 React + TailwindCSS 前端项目
+- 配置 Vite 构建工具
+- 配置 TypeScript
+- 配置 TailwindCSS
+- 实现路由系统 (/panel)
+- 实现 Dashboard 页面
+- 实现 Scan Management 扫描管理页面
+- 实现 AI Validation 验证页面 (支持 Chat, Validate, Review)
+- 实现 Etherscan 区块链查询页面
+- 实现 GitHub CI/CD 状态页面
+
+#### 创建的文件:
+- /home/da/Vespera-coze/web/package.json
+- /home/da/Vespera-coze/web/vite.config.ts
+- /home/da/Vespera-coze/web/tsconfig.json
+- /home/da/Vespera-coze/web/tsconfig.node.json
+- /home/da/Vespera-coze/web/tailwind.config.js
+- /home/da/Vespera-coze/web/postcss.config.js
+- /home/da/Vespera-coze/web/index.html
+- /home/da/Vespera-coze/web/src/main.tsx
+- /home/da/Vespera-coze/web/src/App.tsx
+- /home/da/Vespera-coze/web/src/index.css
+- /home/da/Vespera-coze/web/src/components/*.tsx
+- /home/da/Vespera-coze/web/src/pages/*.tsx
+- /home/da/Vespera-coze/web/src/hooks/useApi.ts
+- /home/da/Vespera-coze/web/src/utils/api.ts
+- /home/da/Vespera-coze/web/src/utils/types.ts
+
+#### 测试结果:
+- [x] npm install 成功
+- [x] npm run lint 通过
+- [x] npm run build 成功
+
+#### 路由结构:
+- /panel - Dashboard (仪表盘)
+- /panel/scans - Scan Management (扫描管理)
+- /panel/ai-validate - AI Validation (AI 验证)
+- /panel/etherscan - Etherscan (区块链查询)
+- /panel/github - GitHub (CI/CD 状态)
+
+#### 技术栈:
+- React 18.2.0
+- React Router v6
+- TailwindCSS 3.4.1
+- Vite 5.1.0
+- TypeScript 5.3.3
+- Axios
+- ESLint

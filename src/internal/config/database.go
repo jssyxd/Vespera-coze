@@ -1,6 +1,7 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -20,8 +21,10 @@ func NewPostgresDB(cfg *DatabaseConfig) (*Database, error) {
 	if sslMode == "" {
 		sslMode = "require"
 	}
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, sslMode)
+	// Handle both int and string port
+	portStr := fmt.Sprintf("%d", cfg.Port)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=Asia/Shanghai",
+		cfg.Host, portStr, cfg.User, cfg.Password, cfg.DBName, sslMode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
@@ -87,4 +90,9 @@ func (d *Database) AutoMigrate(chain string) error {
 
 func (d *Database) GetDB() *gorm.DB {
 	return d.DB
+}
+
+// GetSQLDB returns the underlying *sql.DB
+func (d *Database) GetSQLDB() (*sql.DB, error) {
+	return d.DB.DB()
 }

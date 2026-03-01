@@ -1,10 +1,13 @@
 package config
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -23,19 +26,14 @@ type Explorer struct {
 	BaseURL string   `yaml:"base_url"`
 }
 
-type DatabaseConfig struct {
+// DatabaseConfigYML YAML配置用的结构
+type DatabaseConfigYML struct {
 	Host     string `yaml:"host"`
 	Port     string `yaml:"port"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	Name     string `yaml:"name"`
-}
-
-type AIConfig struct {
-	OpenAI   AIProvider `yaml:"openai"`
-	DeepSeek AIProvider `yaml:"deepseek"`
-	Gemini   AIProvider `yaml:"gemini"`
-	LocalLLM AIProvider `yaml:"local_llm"`
+	DBName   string `yaml:"dbname"`
+	SSLMode  string `yaml:"ssl_mode"`
 }
 
 type AIProvider struct {
@@ -45,10 +43,17 @@ type AIProvider struct {
 	Proxy   string `yaml:"proxy"`
 }
 
+type AIConfigYML struct {
+	OpenAI   AIProvider `yaml:"openai"`
+	DeepSeek AIProvider `yaml:"deepseek"`
+	Gemini   AIProvider `yaml:"gemini"`
+	LocalLLM AIProvider `yaml:"local_llm"`
+}
+
 type AppConfig struct {
-	AI       AIConfig               `yaml:"ai"`
+	AI       AIConfigYML          `yaml:"ai"`
 	Chains   map[string]ChainConfig `yaml:"chains"`
-	Database DatabaseConfig         `yaml:"database"`
+	Database DatabaseConfigYML    `yaml:"database"`
 }
 
 var GlobalConfig *AppConfig
@@ -56,7 +61,7 @@ var loadOnce sync.Once
 var loadedConfig *AppConfig
 var loadedErr error
 
-// helloq LoadConfig 加载 YAML 配置
+// LoadConfig 加载 YAML 配置
 func LoadConfig() (*AppConfig, error) {
 	loadOnce.Do(func() {
 		configPath := findConfigFile()
@@ -112,6 +117,42 @@ func (c *AppConfig) GetChainConfig(chainName string) (*ChainConfig, error) {
 	return &chain, nil
 }
 
+// GetChainConfig 获取链配置 (包级函数)
+func GetChainConfig(chainName string) (*ChainConfig, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+	return cfg.GetChainConfig(chainName)
+}
+
+// InitDB 初始化数据库连接
+func InitDB(ctx context.Context) (*sql.DB, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+	dbCfg := &DatabaseConfig{
+		Host:     cfg.Database.Host,
+		Port:     5432, // default
+		User:     cfg.Database.User,
+		Password: cfg.Database.Password,
+		DBName:   cfg.Database.DBName,
+		SSLMode:  cfg.Database.SSLMode,
+	}
+	// Try to parse port from string
+	if portStr := cfg.Database.Port; portStr != "" {
+		var portInt int
+		fmt.Sscanf(portStr, "%d", &portInt)
+		dbCfg.Port = portInt
+	}
+	db, err := NewPostgresDB(dbCfg)
+	if err != nil {
+		return nil, err
+	}
+	return db.GetSQLDB()
+}
+
 func (c *AppConfig) GetAIConfig(provider string) (*AIProvider, error) {
 	switch provider {
 	case "openai", "gpt4", "chatgpt5":
@@ -147,7 +188,7 @@ func (c *AppConfig) GetAIConfig(provider string) (*AIProvider, error) {
 	}
 }
 
-func (c *AppConfig) GetDatabaseDSN(includeDBName bool) string {
+func (c *AppConfig) GetDatabaseDSN(includeDBName bool) (string, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/",
 		c.Database.User,
 		c.Database.Password,
@@ -155,11 +196,11 @@ func (c *AppConfig) GetDatabaseDSN(includeDBName bool) string {
 		c.Database.Port,
 	)
 	if includeDBName {
-		dsn += fmt.Sprintf("%s?parseTime=true&charset=utf8mb4", c.Database.Name)
+		dsn += fmt.Sprintf("%s?parseTime=true&charset=utf8mb4", c.Database.DBName)
 	} else {
 		dsn += "?parseTime=true&charset=utf8mb4"
 	}
-	return dsn
+	return dsn, nil
 }
 
 func GetConfigPath() string {
@@ -172,4 +213,56 @@ func GetConfigDir() string {
 		return "config"
 	}
 	return filepath.Dir(configPath)
+}
+
+// GetTableName 获取表名
+func GetTableName(chainName string) (string, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return "", err
+	}
+	chain, exists := cfg.Chains[chainName]
+	if !exists {
+		return "", fmt.Errorf("chain %s not found", chainName)
+	}
+	return chain.TableName, nil
+}
+
+// GetRPCManager 获取 RPC 管理器
+func GetRPCManager(chainName string, proxy string) (*RPCManager, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+	chain, exists := cfg.Chains[chainName]
+	if !exists {
+		return nil, fmt.Errorf("chain %s not found", chainName)
+	}
+	return NewRPCManager(chainName, chain.RPCURLs, 30*time.Second, proxy)
+}
+
+// GetExplorerConfig 获取浏览器配置
+func GetExplorerConfig(chainName string) (*Explorer, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+	chain, exists := cfg.Chains[chainName]
+	if !exists {
+		return nil, fmt.Errorf("chain %s not found", chainName)
+	}
+	return &chain.Explorer, nil
+}
+
+// GetAPIKeyManager 获取 API 密钥管理器
+func GetAPIKeyManager(chainName string) (*APIKeyManager, error) {
+	cfg, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+	chain, exists := cfg.Chains[chainName]
+	if !exists {
+		return nil, fmt.Errorf("chain %s not found", chainName)
+	}
+	return NewAPIKeyManager(chain.Explorer.APIKeys, ""), nil
 }
