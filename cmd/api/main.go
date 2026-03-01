@@ -69,6 +69,12 @@ func main() {
 		v1.POST("/github/repos/:owner/:repo/pulls", createPR)
 		v1.GET("/github/repos/:owner/:repo/actions/runs", getWorkflowRuns)
 		v1.POST("/github/repos/:owner/:repo/actions/workflows/:workflow_id/dispatch", triggerWorkflow)
+		// Additional endpoints for frontend
+		v1.GET("/github/workflows/:repo", getWorkflowsByName)
+		v1.GET("/github/runs/:repo", getRunsByRepo)
+		v1.GET("/github/prs/:repo", getPRsByRepo)
+		v1.GET("/github/actions/:repo", getActionsByRepo)
+		v1.GET("/github/repos", getAllRepos)
 	}
 
 	port := os.Getenv("SERVER_PORT")
@@ -268,4 +274,54 @@ func getWorkflowRuns(c *gin.Context) {
 
 func triggerWorkflow(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "workflow triggered"})
+}
+
+// Additional GitHub handlers for frontend compatibility
+func getAllRepos(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"data": []gin.H{
+			{
+				"name":         "vespera-coze",
+				"full_name":    "jssyxd/vespera-coze",
+				"visibility":   "public",
+				"language":      "Go",
+				"stars":         0,
+			},
+		},
+	})
+}
+
+func getWorkflowsByName(c *gin.Context) {
+	repo := c.Param("repo")
+	c.JSON(http.StatusOK, gin.H{
+		"data": []gin.H{
+			{"id": 1, "name": "CI", "state": "active"},
+			{"id": 2, "name": "Deploy", "state": "active"},
+		},
+		"repo": repo,
+	})
+}
+
+func getRunsByRepo(c *gin.Context) {
+	repo := c.Param("repo")
+	c.JSON(http.StatusOK, gin.H{
+		"data": []gin.H{},
+		"repo": repo,
+	})
+}
+
+func getPRsByRepo(c *gin.Context) {
+	repo := c.Param("repo")
+	c.JSON(http.StatusOK, gin.H{
+		"data": []gin.H{},
+		"repo": repo,
+	})
+}
+
+func getActionsByRepo(c *gin.Context) {
+	repo := c.Param("repo")
+	c.JSON(http.StatusOK, gin.H{
+		"data": []gin.H{},
+		"repo": repo,
+	})
 }
